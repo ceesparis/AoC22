@@ -9,15 +9,14 @@ determineFirstUniqueFragment = { int size ->
         String currentFragment = text.substring(i, i+size)
         Set<String> uniqueLettersFragment = new HashSet<String>(Arrays.asList(currentFragment.split("")))
         if(uniqueLettersFragment.size() == size){
-            println currentFragment
-            println i+size
-            break
+            return i+size
         }
     }
+    return 0
 }
 
 // part one
-determineFirstUniqueFragment(4)
+println determineFirstUniqueFragment(4)
 // part two
-determineFirstUniqueFragment(14)
+println determineFirstUniqueFragment(14)
 
