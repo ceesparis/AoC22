@@ -5,43 +5,109 @@ List<List<Integer>> grid = []
 
 file.eachLine { line ->
     List<Integer> row = line.split("");
-    row.stream().map(element -> element.toInteger())
+    row = row.stream().map(element -> element.toInteger())
     grid.add(row)
-    println row
 }
 
-Closure performMove = { boolean addition, int number ->
-    return addition ? (number += 1) : (number -= 1)
-}
+isVisibleFromOutside = { int y, int x -> {
+    boolean visibleFromUp = true
 
-
-
-Closure inTheWay = {boolean addition, int y, int x,  String horOrDir ->
-    int placeToCheck;
-    if (horOrDir == "x") placeToCheck = grid[y][performMove(addition, x)]
-    else placeToCheck = grid[performMove(addition, y)][x]
-    if (placeToCheck >= grid[y][x]) return true
-    else return false
-}
-
-Closure isVisibleFromDirection = { int y, int x, boolean condition, boolean addition, String horOrDir ->
-    int count
-    if(horOrDir == "x") count = x
-    else count = y
-    while (condition) {
-        performMove(addition, count)
-        if(inTheWay(addition, grid[y][x], horOrDir)) return false
+    int cursor = y
+    while(cursor > 0) {
+        cursor--
+        if (grid[y][x] <= grid[cursor][x]) visibleFromUp = false
     }
-}
+
+    boolean visibleFromDown = true
+    cursor = y
+    while(cursor < grid.size()-1) {
+        cursor++
+        if (grid[y][x] <= grid[cursor][x]) visibleFromDown = false
+    }
+
+    boolean visibleFromLeft = true
+    cursor = x
+    while(cursor > 0) {
+        cursor--
+        if (grid[y][x] <= grid[y][cursor]) visibleFromLeft = false
+    }
+
+    boolean visibleFromRight = true
+    cursor = x
+    while(cursor < grid[0].size()-1) {
+        cursor++
+        if (grid[y][x] <= grid[y][cursor]) visibleFromRight = false
+    }
+    return visibleFromUp || visibleFromDown || visibleFromLeft || visibleFromRight
+}}
 
 int interiorCount = 0
 
-for(int i = 1; i < grid.size()-2; i ++) {
-    for(int j = 1; j < grid[0].size()-2; j++) {
-        if(isVisibleFromOutside(i, j, )) interiorCount++
+for(int i = 1; i < grid.size()-1; i++) {
+    for(int j = 1; j < grid[0].size()-1; j++) {
+        if(isVisibleFromOutside(i, j)) interiorCount++
     }
 }
 
 println interiorCount + grid.size() * 4 -4
 
+determineScenicScore = { int y, int x ->
+    int scoreUp = 0
 
+    int cursor = y
+    while(cursor > 0) {
+        cursor--
+        if (grid[y][x] <= grid[cursor][x]){
+          scoreUp++
+          break
+        }
+        else scoreUp++
+    }
+
+    int scoreDown = 0
+
+    cursor = y
+    while(cursor < grid.size()-1) {
+        cursor++
+        if (grid[y][x] <= grid[cursor][x]){
+            scoreDown++
+            break
+        }
+        else scoreDown++
+    }
+
+    int scoreLeft = 0
+
+    cursor = x
+    while(cursor > 0) {
+        cursor--
+        if (grid[y][x] <= grid[y][cursor]){
+            scoreLeft++
+            break
+        }
+        else scoreLeft++
+    }
+
+    int scoreRight = 0
+    cursor = x
+    while(cursor < grid[0].size()-1) {
+        cursor++
+        if (grid[y][x] <= grid[y][cursor]){
+            scoreRight++
+            break
+        }
+        else scoreRight++
+    }
+    return scoreUp * scoreDown * scoreLeft * scoreRight
+}
+
+int max = 0
+
+for(int i = 0; i < grid.size(); i++) {
+    for(int j = 1; j < grid[0].size(); j++) {
+        int currentScenicScore = determineScenicScore(i, j)
+        if (currentScenicScore > max) max = currentScenicScore
+    }
+}
+
+println max
